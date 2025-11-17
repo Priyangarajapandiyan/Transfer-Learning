@@ -1,100 +1,207 @@
-# Implementation-of-Transfer-Learning
-## Aim
-To Implement Transfer Learning for classification using VGG-19 architecture.
-## Problem Statement and Dataset
-Develop an image classification model using transfer learning with the pre-trained VGG19 model.
+# Implementation-of-filter
+## Aim:
+To implement filters for smoothing and sharpening the images in the spatial domain.
+
+## Software Required:
+Anaconda - Python 3.7
+
+## Algorithm:
+### Step 1
+Import the necessary libraries (cv2, numpy, matplotlib.pyplot) and read the input image using cv2.imread().
 </br>
+</br> 
+
+### Step 2
+Define the kernels for the filters, such as an averaging kernel for smoothing (e.g., a 5x5 matrix of ones divided by 25) and a Laplacian kernel for sharpening.
 </br>
+</br> 
+
+### Step 3
+Apply the smoothing filters to the original image using functions like cv2.filter2D() for the averaging filter, cv2.GaussianBlur() for Gaussian blur, and cv2.medianBlur() for median blur.
+</br>
+</br> 
+
+### Step 4
+Apply the sharpening filter using cv2.filter2D() with the Laplacian kernel, and then add this filtered output to the original image to create the final sharpened image.
+</br>
+</br> 
+
+### Step 5
+Display the original, smoothed, and sharpened images side-by-side using matplotlib.pyplot.imshow() and plt.subplot() for comparison.
+</br>
+</br> 
+
+## Program
+### Developed By   : AHALYA S
+### Register Number: 212223230006
 </br>
 
-## DESIGN STEPS
+### 1. Smoothing Filters
 
-### STEP 1:
-Import required libraries.Then dataset is loaded and define the training and testing dataset.
-### STEP 2:
-initialize the model,loss function,optimizer. CrossEntropyLoss for multi-class classification and Adam optimizer for efficient training.
-### STEP 3:
-Train the model with training dataset.
-### STEP 4:
-Evaluate the model with testing dataset.
-### STEP 5:
-Make Predictions on New Data.
+i) Using Averaging Filter
+```Python
 
-## PROGRAM
-```python
-# Load Pretrained Model and Modify for Transfer Learning
-from torchvision.models import VGG19_Weights
-model = models.vgg19(weights = VGG19_Weights.DEFAULT)
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+image1=cv2.imread("flower.jpg")
+image2=cv2.cvtColor(image1,cv2.COLOR_BGR2RGB)
+kernel=np.ones((11,11),np.float32)/169
+image3=cv2.filter2D(image2,-1,kernel)
+plt.figure(figsize=(9,9))
+plt.subplot(1,2,1)
+plt.imshow(image2)
+plt.title("Original Image")
+plt.axis("off")
+plt.subplot(1,2,2)
+plt.imshow(image3)
+plt.title("Average Filter Image")
+plt.axis("off")
+plt.show()
 
-# Modify the final fully connected layer to match the dataset classes
-in_features = model.classifier[-1].in_features
-model.classifier[-1] = nn.Linear(in_features, len(train_dataset.classes))
 
-# Include the Loss function and optimizer
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-# Train the model
-def train_model(model, train_loader,test_loader,num_epochs=10):
-    train_losses = []
-    val_losses = []
-    model.train()
-    for epoch in range(num_epochs):
-        running_loss = 0.0
-        for images, labels in train_loader:
-            images, labels = images.to(device), labels.to(device)
-            optimizer.zero_grad()
-            outputs = model(images)
-            loss = criterion(outputs, labels)
-            loss.backward()
-            optimizer.step()
-            running_loss += loss.item()
-        train_losses.append(running_loss / len(train_loader))
 
-        
-        model.eval()
-        val_loss = 0.0
-        with torch.no_grad():
-            for images, labels in test_loader:
-                images, labels = images.to(device), labels.to(device)
-                outputs = model(images)
-                loss = criterion(outputs, labels)
-                val_loss += loss.item()
 
-        val_losses.append(val_loss / len(test_loader))
-        model.train()
+```
+ii) Using Weighted Averaging Filter
+```Python
 
-        print(f'Epoch [{epoch+1}/{num_epochs}], Train Loss: {train_losses[-1]:.4f}, Validation Loss: {val_losses[-1]:.4f}')
 
-   
-    plt.figure(figsize=(8, 6))
-    plt.plot(range(1, num_epochs + 1), train_losses, label='Train Loss', marker='o')
-    plt.plot(range(1, num_epochs + 1), val_losses, label='Validation Loss', marker='s')
-    plt.xlabel('Epochs')
-    plt.ylabel('Loss')
-    plt.title('Training and Validation Loss')
-    plt.legend()
-    plt.show()
+kernel1=np.array([[1,2,1],[2,4,2],[1,2,1]])/16
+image2=cv2.cvtColor(image1,cv2.COLOR_BGR2RGB)
+image3=cv2.filter2D(image2,-1,kernel1)
+plt.subplot(1,2,1)
+plt.imshow(image2)
+plt.title("Original Image")
+plt.axis("off")
+plt.subplot(1,2,2)
+plt.imshow(image3)
+plt.title("Weighted Average Filter Image")
+plt.axis("off")
+plt.show()
+
+
+
+```
+iii) Using Gaussian Filter
+```Python
+
+
+
+gaussian_blur=cv2.GaussianBlur(image2,(33,33),0,0)
+plt.subplot(1,2,1)
+plt.imshow(image2)
+plt.title("Original Image")
+plt.axis("off")
+plt.subplot(1,2,2)
+plt.imshow(gaussian_blur)
+plt.title("Gaussian Blur")
+plt.axis("off")
+plt.show()
+
+```
+iv)Using Median Filter
+```Python
+
+
+median=cv2.medianBlur(image2,13)
+plt.figure(figsize=(9,9))
+plt.subplot(1,2,1)
+plt.imshow(image2)
+plt.title("Original Image")
+plt.axis("off")
+plt.subplot(1,2,2)
+plt.imshow(median)
+plt.title("Median Blur")
+plt.axis("off")
+plt.show()
+
 
 ```
 
-## OUTPUT
-### Training Loss, Validation Loss Vs Iteration Plot
+### 2. Sharpening Filters
+i) Using Laplacian Linear Kernal
+```Python
 
-![image](https://github.com/user-attachments/assets/bacc5d65-38b7-41d2-9c3f-e4db5f125308)
 
-### Confusion Matrix
 
-![image](https://github.com/user-attachments/assets/203e8064-fd07-47dd-b950-cc885d293ba6)
+kernel2=np.array([[-1,-1,-1],[2,-2,1],[2,1,-1]])
+image3=cv2.filter2D(image2,-1,kernel2)
+plt.subplot(1,2,1)
+plt.imshow(image2)
+plt.title("Original Image")
+plt.axis("off")
+plt.subplot(1,2,2)
+plt.imshow(image3)
+plt.title("Laplacian Kernel")
+plt.axis("off")
+plt.show()
 
-### Classification Report
+```
+ii) Using Laplacian Operator
+```Python
 
-![image](https://github.com/user-attachments/assets/54308e89-575d-4f69-ae53-9322225e494e)
 
-### New Sample Prediction
-![image](https://github.com/user-attachments/assets/7a1106cb-8a7d-493d-8572-13482975015f)
+laplacian=cv2.Laplacian(image2,cv2.CV_64F)
+plt.subplot(1,2,1)
+plt.imshow(image2)
+plt.title("Original Image")
+plt.axis("off")
+plt.subplot(1,2,2)
+plt.imshow(laplacian)
+plt.title("Laplacian Operator")
+plt.axis("off")
+plt.show()
 
-![image](https://github.com/user-attachments/assets/5e4c3b96-c003-4261-80c4-1b6b44a56ec4)
 
-## RESULT
-Thus, the transfer Learning for classification using VGG-19 architecture has succesfully implemented.
+```
+
+## OUTPUT:
+### 1. Smoothing Filters
+</br>
+
+i) Using Averaging Filter
+
+</br>
+</br>
+<img width="717" height="272" alt="download" src="https://github.com/user-attachments/assets/91728bf8-3479-41e1-9ef5-1e6e926d267a" />
+
+ii)Using Weighted Averaging Filter
+
+</br>
+</br>
+<img width="531" height="205" alt="download" src="https://github.com/user-attachments/assets/53b91ed4-46f8-481d-94c3-136ecff408d0" />
+
+iii)Using Gaussian Filter
+
+</br>
+</br>
+<img width="515" height="205" alt="download" src="https://github.com/user-attachments/assets/62b39284-c413-437f-9ef2-dc3163ff8f93" />
+
+iv) Using Median Filter
+
+</br>
+</br>
+<img width="717" height="272" alt="download" src="https://github.com/user-attachments/assets/859f6c1b-dde0-4ff1-b21b-50b016ee6fff" />
+
+### 2. Sharpening Filters
+</br>
+
+i) Using Laplacian Kernal
+
+</br>
+</br>
+<img width="515" height="205" alt="download" src="https://github.com/user-attachments/assets/36414416-fe2a-4f8c-aa01-a55e0cc097e4" />
+ii) Using Laplacian Operator
+</br>
+
+</br>
+</br>
+<img width="515" height="205" alt="download" src="https://github.com/user-attachments/assets/a22c957b-383f-4600-96a2-6c11f82276d3" />
+
+</br>
+</br>
+
+## Result:
+Thus the filters are designed for smoothing and sharpening the images in the spatial domain.
